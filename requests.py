@@ -1,7 +1,6 @@
 from db import db
 import users
 
-
 def add(movieid):
     command = """INSERT INTO requests VALUES (:userid, :movieid)"""
     db.session.execute(
@@ -20,6 +19,7 @@ def get_movie_request(movieid):
     command = """SELECT * FROM requests WHERE movieid=:movieid"""
     value = db.session.execute(command, {"movieid": movieid})
     return value.fetchone()
+
 
 def delete(movieid):
     command = """DELETE FROM requests WHERE movieid=:movieid"""

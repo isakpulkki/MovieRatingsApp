@@ -1,13 +1,12 @@
 from flask import make_response
 from db import db
 
-
 def add(name, description, data, genreid):
     command = """INSERT INTO movies (name, description, cover, genreid) VALUES (:name, :description, :cover, :genreid) RETURNING id"""
-    id = db.session.execute(command, {
-                            "name": name, "description": description, "cover": data, "genreid": genreid})
+    index = db.session.execute(command, {
+        "name": name, "description": description, "cover": data, "genreid": genreid})
     db.session.commit()
-    return id.fetchone()[0]
+    return index.fetchone()[0]
 
 
 def get_all():
@@ -38,7 +37,7 @@ def search(query):
     M LEFT JOIN reviews R ON M.id=R.movieid LEFT JOIN genres G ON G.id = M.genreid LEFT JOIN requests Q ON Q.movieid = M.id 
     WHERE Q.movieid IS NULL AND LOWER(M.name) LIKE LOWER(:query) OR LOWER(M.description) LIKE LOWER(:query) GROUP BY M.id, 
     G.name ORDER BY M.id DESC"""
-    result = db.session.execute(command, {"query": "%"+query+"%"})
+    result = db.session.execute(command, {"query": f"%{query}%"})
     return result.fetchall()
 
 
@@ -53,8 +52,7 @@ def get_one(id):
 def get_cover(id):
     result = db.session.execute(
         "SELECT cover FROM movies WHERE id=:id", {"id": id})
-    data = result.fetchone()
-    if data:
+    if data := result.fetchone():
         response = make_response(bytes(data[0]))
         response.headers.set("Content-Type", "image/jpeg")
         return response
