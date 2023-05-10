@@ -9,8 +9,7 @@ import requests
 @app.route("/")
 def index():
     if request.method == "GET":
-        result = movies.get_all()
-        if result:
+        if result := movies.get_all():
             return render_template("index.html", movies=result)
         return render_template("error.html", message="Movies have not been added yet")
 
@@ -19,8 +18,7 @@ def index():
 def search():
     if request.method == "GET":
         query = request.args["query"]
-        result = movies.search(query)
-        if result:
+        if result := movies.search(query):
             return render_template("movies.html", movies=result, genres=genres.get())
         return render_template("error.html", message="Your search did not match any results")
 
@@ -36,17 +34,15 @@ def get_user():
 @app.route("/movies", methods=["GET", "POST"])
 def get_movies():
     if request.method == "GET":
-        result = movies.get_all()
-        if result:
-            return render_template("movies.html", movies=result, genres=genres.get_implemented())
+        if result := movies.get_all():
+            return render_template("movies.html", movies=result, genres=genres.get_genres())
         return render_template("error.html", message="Movies have not been added yet")
     if request.method == "POST":
         genreid = request.form["genre"]
         if genreid == "all":
-            return render_template("movies.html", movies=movies.get_all(), genres=genres.get_implemented())
-        result = movies.get_genre(genreid)
-        if result:
-            return render_template("movies.html", movies=result, genres=genres.get_implemented(), selected=int(genreid))
+            return render_template("movies.html", movies=movies.get_all(), genres=genres.get_genres())
+        if result := movies.get_genre(genreid):
+            return render_template("movies.html", movies=result, genres=genres.get_genres(), selected=int(genreid))
         return render_template("error.html", message="This genre does not have movies yet")
 
 
@@ -67,49 +63,49 @@ def approve_requests(movieid):
 def get_requests():
     if request.method == "GET":
         if users.get_admin():
-            result = movies.get_requested()
-            if result:
-                return render_template("requests.html", movies=result)
-            return render_template("error.html", message="Movies have not been requested yet")
-        return render_template("error.html", message="You don't have access to this page")
+            return (render_template("requests.html", movies=result)
+                    if (result := movies.get_requested())
+                    else render_template(
+                    "error.html", message="Movies have not been requested yet"))
+        else:
+            return render_template("error.html", message="You don't have access to this page")
 
 
 @app.route("/request", methods=["GET", "POST"])
 def request_movie():
-    if users.get_user_id():
-        if len(requests.get_user_request()) >= 3:
-            return render_template("error.html", message="You have already requested three movies, wait until they are accepted to request a new one")
-        if request.method == "GET":
-            return render_template("request.html", genres=genres.get())
-        if request.method == "POST":
-            if users.check_csrf() != request.form["csrf_token"]:
-                abort(403)
-            cover = request.files['cover']
-            name = request.form["name"]
-            genre = request.form["genre"]
-            description = request.form["description"]
-            if not cover or not description or not name:
-                return render_template("error.html", message="Movie needs name, description and cover photo")
-            if len(description) > 980 or len(name) > 180:
-                return render_template("error.html", message="Your name or description is too long")
-            if cover.filename.endswith('.jpg') or cover.filename.endswith('.png') or cover.filename.endswith('.jpeg'):
-                data = cover.read()
-                if users.get_admin():
-                    if not movies.add(name, description, data, genre):
-                        return render_template("error.html", message="Something went wrong")
-                elif not requests.add(movies.add(name, description, data, genre)):
-                    return render_template("error.html", message="Something went wrong")
-                return redirect("/request")
-            return render_template("error.html", message="Cover photo needs to be in .jpg or .png filetype")
-    else:
+    if not users.get_user_id():
         return render_template("error.html", message="You must be logged in to request new movies")
+    if len(requests.get_user_request()) >= 3:
+        return render_template("error.html", message="You have already requested three movies, wait \
+                                until they are accepted to request a new one")
+    if request.method == "GET":
+        return render_template("request.html", genres=genres.get())
+    if request.method == "POST":
+        if users.check_csrf() != request.form["csrf_token"]:
+            abort(403)
+        cover = request.files['cover']
+        name = request.form["name"]
+        genre = request.form["genre"]
+        description = request.form["description"]
+        if not cover or not description or not name:
+            return render_template("error.html", message="Movie needs name, description and cover photo")
+        if len(description) > 980 or len(name) > 180:
+            return render_template("error.html", message="Your name or description is too long")
+        if cover.filename.endswith('.jpg') or cover.filename.endswith('.png') or cover.filename.endswith('.jpeg'):
+            data = cover.read()
+            if users.get_admin():
+                if not movies.add(name, description, data, genre):
+                    return render_template("error.html", message="Something went wrong")
+            elif not requests.add(movies.add(name, description, data, genre)):
+                return render_template("error.html", message="Something went wrong")
+            return redirect("/request")
+        return render_template("error.html", message="Cover photo needs to be in .jpg or .png filetype")
 
 
 @app.route("/add", methods=["GET", "POST"])
 def add_movie():
-    if users.get_admin():
-        if request.method == "GET":
-            return render_template("request.html", genres=genres.get())
+    if users.get_admin() and request.method == "GET":
+        return render_template("request.html", genres=genres.get())
     return render_template("error.html", message="You don't have access to this page")
 
 
@@ -118,9 +114,8 @@ def delete_movie(movieid):
     if request.method == "POST":
         if users.check_csrf() != request.form["csrf_token"]:
             abort(403)
-        if (users.get_admin()):
-            if movies.delete(movieid):
-                return redirect("/movies")
+        if (users.get_admin()) and movies.delete(movieid):
+            return redirect("/movies")
         return render_template("error.html", message="Something went wrong")
 
 
@@ -128,16 +123,17 @@ def delete_movie(movieid):
 def get_cover(id):
     if request.method == "GET":
         cover = movies.get_cover(id)
-        if not cover:
-            return render_template("error.html", message="This cover does not exist")
-        return cover
+        return (
+            cover or render_template(
+                "error.html", message="This cover does not exist"))
 
 
 @app.route("/movies/<int:id>", methods=["GET", "POST"])
 def get_movie(id):
     if request.method == "GET":
         if movies.get_one(id):
-            return render_template("movie.html", movie=movies.get_one(id), reviews=reviews.get_movie_reviews(id), review=reviews.get_user_review(id))
+            return render_template("movie.html", movie=movies.get_one(id),
+                        reviews=reviews.get_movie_reviews(id), review=reviews.get_user_review(id))
         return render_template("error.html", message="This movie does not exist")
 
 
@@ -157,7 +153,8 @@ def add_review(movieid):
             if not stars:
                 return render_template("error.html", message="Something went wrong, did you select rating?")
             if len(description) > 780:
-                return render_template("error.html", message="Review description should be less than 780 characters")
+                return render_template("error.html", message="Review description should be less than \
+                                       780 characters")
             if stars < 1 or stars > 5 or not reviews.add(description, stars, movieid):
                 return render_template("error.html", message="Something went wrong")
             return redirect("/movies/" + str(movieid))
@@ -170,7 +167,7 @@ def delete_review(movieid, reviewid):
         abort(403)
     if request.method == "POST":
         if reviews.delete(reviewid):
-            return redirect("/movies/" + str(movieid))
+            return redirect(f"/movies/{str(movieid)}")
         return render_template("error.html", message="Something went wrong")
 
 
@@ -202,13 +199,13 @@ def register():
         return render_template("register.html")
     if request.method == "POST":
         username = request.form["username"]
-        if users.username_taken(username):
+        if users.username_available(username):
             return render_template("error.html", message="Username already taken, try another one")
         if len(username) < 3 or len(username) > 16:
             return render_template("error.html", message="Your username should contain 3-16 characters")
         password = request.form["password"]
         password2 = request.form["password2"]
-        if not password == password2:
+        if password != password2:
             return render_template("error.html", message="Your password's are not the same")
         if len(password) < 5 or len(username) > 24:
             return render_template("error.html", message="Your password should contain 5-24 characters")
@@ -233,19 +230,16 @@ def change_password():
                 return render_template("error.html", message="Your password's are not the same")
             if users.change_password(oldpassword, password):
                 return redirect("/")
-            return render_template("error.html", message="Something went wrong, did you select correct old password?")
+            return render_template("error.html", message="Something went wrong, did you \
+                                   select correct old password?")
 
 
 @app.errorhandler(403)
-def page_error(e):
-    return render_template('error.html', message="Something went wrong")
-
-
 @app.errorhandler(404)
-def page_not_found(e):
-    return render_template('error.html', message="The page you are trying to reach does not exist")
-
-
 @app.errorhandler(405)
-def page_no_method(e):
-    return render_template('error.html', message="The method is not allowed for the requested URL")
+def handle_error(error):
+    messages = {
+        403: "Something went wrong",
+        404: "The page you are trying to reach does not exist",
+        405: "The method is not allowed for the requested URL"}
+    return render_template('error.html', message=messages.get(error.code))
