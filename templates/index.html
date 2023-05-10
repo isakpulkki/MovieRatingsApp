@@ -52,6 +52,10 @@
                 {% else %}
                 <i>No reviews yet</i>
                 {% endif %}
+                <form action="/movies/{{movie.id}}">
+                  <input type="submit" button type="button" class="btn btn-secondary btn-center mt-4"
+                      value="Read more"></button>
+              </form>
             </div>
             {% endfor %}
           </div>
