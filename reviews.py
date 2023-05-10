@@ -1,7 +1,6 @@
 from db import db
 import users
 
-
 def add(description, stars, movieid):
     command = """INSERT INTO reviews (description, stars, userid, movieid, date) VALUES (:description, :stars, :userid, :movieid, NOW())"""
     db.session.execute(command, {"description": description, "stars": stars,
@@ -35,8 +34,7 @@ def delete(id):
         if db.session.execute(command, {"reviewid": id, "userid": users.get_user_id()}):
             db.session.commit()
             return True
-    else:
-        if db.session.execute("""DELETE FROM reviews WHERE id=:reviewid""", {"reviewid": id}):
-            db.session.commit()
-            return True
+    elif db.session.execute("""DELETE FROM reviews WHERE id=:reviewid""", {"reviewid": id}):
+        db.session.commit()
+        return True
     return False
