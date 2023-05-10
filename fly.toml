@@ -1,8 +1,12 @@
-# fly.toml file generated for movieratingsapp on 2022-12-04T02:08:23+02:00
+# fly.toml app configuration file generated for movieratingsapp on 2023-05-10T03:13:50+03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
 app = "movieratingsapp"
 kill_signal = "SIGINT"
 kill_timeout = 5
+primary_region = "arn"
 processes = []
 
 [build]
