@@ -10,7 +10,7 @@ You can test the application at [Fly.io](https://movieratingsapp.fly.dev). You m
 | - | - |
 | admin  | admin  |
 
-To run the application locally you need to have Flask and PostgreSQL installed. Specify database URL and secret key in the [app.py](https://github.com/isakpulkki/MovieRatingsApp/blob/main/app.py). After that run the following commands.
+To run the application locally you need to have Python and PostgreSQL installed. Create a `.env` file in the root directory and specify the database URL and the secret key inside the file, for example as `DATABASE_URL=postgresql:///user`. After that run the following commands.
 
 ```bash
 # Create virtual environment
@@ -24,6 +24,9 @@ $ pip install -r ./requirements.txt
 
 # Configure the database
 $ psql < schema.sql
+
+# Navigate to the right directory
+$ cd src
 
 # Run the application
 $ flask run
