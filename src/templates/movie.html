@@ -1,0 +1,111 @@
+{% extends "layout.html" %}
+{% block content %}
+<script src="/static/js/stars.js"></script>
+
+<div class="col-12 text-center">
+  <div class=" card rounded-3">
+    <div class="card-body mt-4 mx-4 mb-4">
+      <img src="/cover/{{ movie.id }}" class="rounded mb-4 w-100"></img>
+      <h2>{{ movie.name }}</h2>
+      <h5 class="mt-2 mb-3">{{movie.genre}}</h5>
+      <p>{{ movie.description }}</p>
+      {% if movie.reviews %}
+      <h5>Average rating</h5>
+      <h2 class="bold">
+        {{movie.reviews}}<small> / 5</small>
+      </h2>
+      <div class="d-flex justify-content-center">
+        {% for i in range(0, movie.reviews ) %}
+        <i class="fa fa-star orange mx-2"></i>
+        {% endfor %}
+        {% for i in range(movie.reviews, 5 ) %}
+        <i class="fa fa-star-o mx-2"></i>
+        {% endfor %}
+        {% else %}
+        <i>No reviews yet</i>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="col-12 text-center mt-4">
+  <div class=" card rounded-3 d-flex flex-grow">
+    <div class="card-body mt-4 mb-4 mx-4">
+      {% if session.user_id and not review %}
+      <h4>Add a new review</h4>
+      <form action="/movies/{{movie.id}}/reviews" method="post">
+        <div class="form-group">
+          <textarea class="form-control mt-4 mb-4" rows="5" name="description" placeholder="The maximum length is 780 characters"></textarea>
+          <input type="hidden" id="selected_rating" name="rate" required="required">
+          <label for="selected_rating">
+            <h2 class="bold">
+              <span class="selected-rating">0</span><small> / 5</small>
+            </h2>
+            {% for i in range(1, 6) %}
+            <button type="button" class="btnrating btn btn-default btn-lg" data-attr="{{i}}" id="rating-star-{{i}}">
+              <i class="fa fa-star"></i>
+            </button>
+            {% endfor %}
+          </label>
+        </div>
+        <input type="submit" button type="button" class="btn btn-secondary btn-center" value="Send"></button>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+      </form>
+      {% elif not session.user_id %}
+      <h5> You must be logged in to make a review, <a href="/login">log in</a> or <a href="/register">register</a>
+        {% elif review %}
+        <h4>Your review</h4>
+        <i>{{review.description}}</i>
+        <h2 class="bold rating-header">
+          {{review.stars }}<small> / 5</small>
+        </h2>
+        <div class="nowrap">
+          {% for i in range(0, review.stars ) %}
+          <i class="fa fa-star orange mx-2"></i>
+          {% endfor %}
+          {% for i in range(review.stars, 5 ) %}
+          <i class="fa fa-star-o mx-2"></i>
+          {% endfor %}
+          <i class=""></i>
+        </div>
+        <p class="mt-2">{{ review.date.strftime('%d. %B %Y') }}</p>
+          <form action="/movies/{{movie.id}}/reviews/delete/{{review.id}}" method="POST">
+            <button type="submit" class="btn btn-secondary btn-lg mx-2"> <i class="fa fa-trash"></i></button>
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+          </form>
+        {% endif %}
+    </div>
+  </div>
+</div>
+
+{% if reviews %}
+{% for x in reviews if not (x.id == review.id) %}
+<div class="col-lg justify-content-center mt-4 flex-column">
+  <div class=" card rounded-3 text-center">
+    <div class="card-body d-flex flex-column flex-grow mt-4 mb-4 mx-4">
+      <h5>{{ x.username }}</h5>
+      <p><i> {{ x.description }}</i></p>
+      <h2 class="bold">
+        {{x.stars }}<small> / 5</small>
+      </h2>
+      <div class="nowrap">
+        {% for i in range(0, x.stars ) %}
+        <i class="fa fa-star orange mx-2"></i>
+        {% endfor %}
+        {% for i in range(x.stars, 5 ) %}
+        <i class="fa fa-star-o mx-2"></i>
+        {% endfor %}
+      </div>
+      <p class="mt-2">{{ x.date.strftime('%d. %B %Y') }}</p>
+      {% if session.user_admin %}
+      <form action="/movies/{{movie.id}}/reviews/delete/{{x.id}}" method="POST">
+        <button type="submit" class="btn btn-secondary btn-lg mx-2"> <i class="fa fa-trash"></i></button>
+        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+        {% endif %}
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}
