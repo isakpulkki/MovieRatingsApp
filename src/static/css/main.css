@@ -1,4 +1,4 @@
-@import url(https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&display=swap);
+@import url(https://applesocial.s3.amazonaws.com/assets/styles/fonts/sanfrancisco/sanfranciscodisplay-regular-webfont.woff);
 
 ::after,
 ::before {
@@ -26,7 +26,7 @@ body {
   line-height: 1.5;
   color: #fff;
   text-align: left;
-  background-color: #141414;
+  background-color: #101010;
 }
 
 [tabindex='-1']:focus:not(:focus-visible) {
@@ -421,7 +421,7 @@ textarea.form-control {
   width: 100%;
 }
 
-.input-group>.custom-file {
+.input-group > .custom-file {
   position: relative;
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
@@ -430,26 +430,26 @@ textarea.form-control {
   margin-bottom: 0;
 }
 
-.input-group>.custom-file .custom-file-input:focus~.custom-file-label {
+.input-group > .custom-file .custom-file-input:focus ~ .custom-file-label {
   z-index: 3;
 }
 
-.input-group>.custom-file .custom-file-input:focus {
+.input-group > .custom-file .custom-file-input:focus {
   z-index: 4;
 }
 
-.input-group>.custom-file {
+.input-group > .custom-file {
   display: -ms-flexbox;
   display: flex;
   -ms-flex-align: center;
   align-items: center;
 }
 
-.custom-control-input:focus:not(:checked)~.custom-control-label::before {
+.custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
   border-color: #739ac2;
 }
 
-.custom-control-input:not(:disabled):active~.custom-control-label::before {
+.custom-control-input:not(:disabled):active ~ .custom-control-label::before {
   color: #fff;
   background-color: #97b3d2;
   border-color: #97b3d2;
@@ -473,12 +473,12 @@ textarea.form-control {
   opacity: 0;
 }
 
-.custom-file-input:focus~.custom-file-label {
+.custom-file-input:focus ~ .custom-file-label {
   border-color: #739ac2;
   box-shadow: 0 0 0 0.2rem rgba(55, 90, 127, 0.25);
 }
 
-.custom-file-input:disabled~.custom-file-label {
+.custom-file-input:disabled ~ .custom-file-label {
   background-color: #ebebeb;
 }
 
@@ -753,7 +753,6 @@ textarea.form-control {
 }
 
 @media (prefers-reduced-motion: reduce) {
-
   .carousel-control-next,
   .carousel-control-prev {
     transition: none;
@@ -822,7 +821,8 @@ textarea.form-control {
   align-self: stretch !important;
 }
 
-@supports ((position: -webkit-sticky) or (position: sticky)) {}
+@supports ((position: -webkit-sticky) or (position: sticky)) {
+}
 
 .sr-only {
   position: absolute;
@@ -910,7 +910,6 @@ textarea.form-control {
 }
 
 @media print {
-
   *,
   ::after,
   ::before {
