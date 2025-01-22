@@ -1,6 +1,7 @@
 from flask import make_response
 from app import db
 
+
 def add(name, description, data, genreid):
     command = """INSERT INTO movies (name, description, cover, genreid) VALUES (:name, :description, :cover, :genreid) RETURNING id"""
     index = db.session.execute(command, {
@@ -9,18 +10,26 @@ def add(name, description, data, genreid):
     return index.fetchone()[0]
 
 
-def get_all():
-    command = """SELECT M.id, M.name, M.description, G.name AS genre, CAST(ROUND(AVG(R.stars)) AS INT) as reviews FROM movies 
-    M LEFT JOIN reviews R ON M.id=R.movieid LEFT JOIN genres G ON G.id = M.genreid LEFT JOIN requests Q ON Q.movieid = M.id 
-    WHERE Q.movieid IS NULL GROUP BY M.id, G.name ORDER BY M.id DESC"""
+def get_all(order="desc"):
+    command = f"""SELECT M.id, M.name, M.description, G.name AS genre, 
+                  CAST(ROUND(AVG(R.stars)) AS INT) as reviews 
+                  FROM movies M 
+                  LEFT JOIN reviews R ON M.id=R.movieid 
+                  LEFT JOIN genres G ON G.id = M.genreid 
+                  GROUP BY M.id, G.name 
+                  ORDER BY M.id {order.upper()}"""
     result = db.session.execute(command)
     return result.fetchall()
 
 
-def get_genre(id):
-    command = """SELECT M.id, M.name, M.description, CAST(ROUND(AVG(R.stars)) AS INT) as reviews FROM movies M LEFT JOIN reviews 
-    R ON M.id=R.movieid LEFT JOIN requests Q ON Q.movieid = M.id WHERE Q.movieid IS NULL AND M.genreid=:genreid GROUP BY M.id 
-    ORDER BY M.id DESC"""
+def get_genre(id, order="desc"):
+    command = f"""SELECT M.id, M.name, M.description, 
+                  CAST(ROUND(AVG(R.stars)) AS INT) as reviews 
+                  FROM movies M 
+                  LEFT JOIN reviews R ON M.id=R.movieid 
+                  WHERE M.genreid=:genreid 
+                  GROUP BY M.id 
+                  ORDER BY M.id {order.upper()}"""
     result = db.session.execute(command, {"genreid": id})
     return result.fetchall()
 

@@ -1,17 +1,27 @@
 from app import app
-from flask import abort, render_template, request, redirect
+from flask import abort, render_template, request, redirect, url_for
 import sql.users as users
 import sql.movies as movies
 import sql.reviews as reviews
 import sql.genres as genres
 import sql.requests as requests
 
-@app.route("/")
-def index():
+@app.route("/", methods=["GET", "POST"])
+def get_movies():
     if request.method == "GET":
-        if result := movies.get_all():
-            return render_template("index.html", movies=result)
-        return render_template("error.html", message="Movies have not been added yet")
+        sort_order = request.args.get("sort", "desc")
+        genre_id = request.args.get("genre", "all")
+        if genre_id == "all":
+            result = movies.get_all(order=sort_order)
+        else:
+            result = movies.get_genre(genre_id, order=sort_order)
+        return render_template(
+            "movies.html",
+            movies=result,
+            genres=genres.get_genres(),
+            sort=sort_order,
+            selected=int(genre_id) if genre_id != "all" else None
+        )
 
 
 @app.route("/search", methods=["GET", "POST"])
@@ -30,20 +40,21 @@ def get_user():
             return render_template("user.html")
         return render_template("error.html", message="You are not logged in")
 
-
-@app.route("/movies", methods=["GET", "POST"])
-def get_movies():
-    if request.method == "GET":
-        if result := movies.get_all():
-            return render_template("movies.html", movies=result, genres=genres.get_genres())
-        return render_template("error.html", message="Movies have not been added yet")
     if request.method == "POST":
-        genreid = request.form["genre"]
-        if genreid == "all":
-            return render_template("movies.html", movies=movies.get_all(), genres=genres.get_genres())
-        if result := movies.get_genre(genreid):
-            return render_template("movies.html", movies=result, genres=genres.get_genres(), selected=int(genreid))
-        return render_template("error.html", message="This genre does not have movies yet")
+        genre_id = request.form.get("genre", "all")
+        sort_order = request.form.get("sort", "desc")
+        if genre_id == "all":
+            result = movies.get_all(order=sort_order)
+        else:
+            result = movies.get_genre(genre_id, order=sort_order)
+
+        return render_template(
+            "movies.html",
+            movies=result,
+            genres=genres.get_genres(),
+            selected=int(genre_id) if genre_id != "all" else None,
+            sort=sort_order
+        )
 
 
 @app.route("/requests/<int:movieid>", methods=["POST"])
@@ -115,7 +126,7 @@ def delete_movie(movieid):
         if users.check_csrf() != request.form["csrf_token"]:
             abort(403)
         if (users.get_admin()) and movies.delete(movieid):
-            return redirect("/movies")
+            return redirect("/")
         return render_template("error.html", message="Something went wrong")
 
 
@@ -133,7 +144,7 @@ def get_movie(id):
     if request.method == "GET":
         if movies.get_one(id):
             return render_template("movie.html", movie=movies.get_one(id),
-                        reviews=reviews.get_movie_reviews(id), review=reviews.get_user_review(id))
+                                   reviews=reviews.get_movie_reviews(id), review=reviews.get_user_review(id))
         return render_template("error.html", message="This movie does not exist")
 
 
@@ -149,16 +160,20 @@ def add_review(movieid):
             if requests.get_movie_request(movieid):
                 return render_template("error.html", message="This movie is still being requested")
             description = request.form["description"]
-            stars = int(request.form["rate"])
+            try:
+                stars = int(request.form["rate"])
+            except ValueError:
+                return render_template("error.html", message="Something went wrong, did you select a rating?")
+
             if not stars:
-                return render_template("error.html", message="Something went wrong, did you select rating?")
+                return render_template("error.html", message="Something went wrong, did you select a rating?")
             if len(description) > 780:
                 return render_template("error.html", message="Review description should be less than \
                                        780 characters")
             if stars < 1 or stars > 5 or not reviews.add(description, stars, movieid):
                 return render_template("error.html", message="Something went wrong")
             return redirect("/movies/" + str(movieid))
-        return render_template("error.html", message="Are you sure your logged in?")
+        return render_template("error.html", message="Are you sure you're logged in?")
 
 
 @app.route("/movies/<int:movieid>/reviews/delete/<int:reviewid>", methods=["POST"])
