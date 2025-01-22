@@ -1,10 +1,11 @@
 import os
+from sqlalchemy.sql import text
 from app import db
 from flask import session
 from werkzeug.security import check_password_hash, generate_password_hash
 
 def login(name, password):
-    command = "SELECT password, id, admin FROM users WHERE name=:name"
+    command = text("SELECT password, id, admin FROM users WHERE name = :name")
     result = db.session.execute(command, {"name": name})
     user = result.fetchone()
     if not user:
@@ -18,24 +19,25 @@ def login(name, password):
     return True, ""
 
 def register(username, password):
-    command = """INSERT INTO users (name, password, admin) VALUES (:name, :password, False)"""
+    command = text("""INSERT INTO users (name, password, admin) 
+                      VALUES (:name, :password, False)""")
     db.session.execute(command, {"name": username, "password": generate_password_hash(password)})
     db.session.commit()
     return True
 
 def username_available(name):
-    result = db.session.execute(
-        """SELECT * FROM users WHERE LOWER(name)=LOWER(:name)""", {"name": name})
+    command = text("""SELECT * FROM users WHERE LOWER(name) = LOWER(:name)""")
+    result = db.session.execute(command, {"name": name})
     return result.fetchone()
 
 def change_password(oldpassword, password):
-    command = "SELECT password FROM users WHERE id=:userid"
+    command = text("SELECT password FROM users WHERE id = :userid")
     result = db.session.execute(command, {"userid": get_user_id()})
     user = result.fetchone()
     if not check_password_hash(user[0], oldpassword):
         return False
-    command = "UPDATE users SET password = :password WHERE id=:userid"
-    result = db.session.execute(
+    command = text("UPDATE users SET password = :password WHERE id = :userid")
+    db.session.execute(
         command, {"userid": get_user_id(), "password": generate_password_hash(password)})
     db.session.commit()
     return True
@@ -50,7 +52,6 @@ def get_user_id():
 
 def get_admin():
     return session.get("user_admin")
-
 
 def get_username():
     return session.get("user_name")
