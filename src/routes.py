@@ -259,5 +259,5 @@ def handle_error(error):
         403: "Something went wrong.",
         404: "The page you are trying to reach does not exist.",
         405: "The method is not1 allowed for the requested URL.",
-        500: "Internal server error."}
+        500: "Internal server error. Please refresh the site!"}
     return render_template('notification.html', message=messages.get(error.code))
