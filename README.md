@@ -18,7 +18,7 @@ User experience has been taken into consideration when creating the application,
 
 ## Instructions
 
-You can test the application live at [Fly.io](https://movieratingsapp.fly.dev). You might have to refresh the site to get the application running. Accessing admin rights in the application happens with the user in the table above.
+You can test the application live [here](https://movieratingsapp.pulkki.me). You might have to refresh the site to get the application running. Accessing admin rights in the application happens with the user in the table above.
 
 | Username  | Password |
 | - | - |
