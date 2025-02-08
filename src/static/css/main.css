@@ -194,16 +194,16 @@ small {
   min-width: 350px;
   position: relative;
   width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
 }
 
 .col-12 {
   min-width: 0px;
   position: relative;
   width: 100%;
-  padding-right: 15px;
-  padding-left: 15px;
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
 }
 
 .col {
@@ -236,10 +236,10 @@ small {
   font-size: 0.9375rem;
   font-weight: 400;
   line-height: 1.5;
-  color: #222;
+  color: #222222;
   background-color: #fff;
   background-clip: padding-box;
-  border: 1px solid #222;
+  border: 1px solid #222222;
   border-radius: 0.25rem;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -290,11 +290,11 @@ small {
 
 select.form-control:-moz-focusring {
   color: transparent;
-  text-shadow: 0 0 0 #222;
+  text-shadow: 0 0 0 #222222;
 }
 
 select.form-control:focus::-ms-value {
-  color: #222;
+  color: #222222;
   background-color: #fff;
 }
 
@@ -352,8 +352,8 @@ textarea.form-control {
 
 .btn-secondary {
   color: #fff;
-  background-color: #222;
-  border-color: #222;
+  background-color: #222222;
+  border-color: #222222;
 }
 
 .btn-secondary:hover {
@@ -371,8 +371,8 @@ textarea.form-control {
 
 .btn-secondary:disabled {
   color: #fff;
-  background-color: #222;
-  border-color: #222;
+  background-color: #222222;
+  border-color: #222222;
 }
 
 .btn-secondary:not(:disabled):not(.disabled).active,
@@ -495,7 +495,7 @@ textarea.form-control {
   line-height: 1.5;
   color: #adb5bd;
   background-color: #fff;
-  border: 1px solid #222;
+  border: 1px solid #222222;
   border-radius: 0.25rem;
 }
 
@@ -511,7 +511,7 @@ textarea.form-control {
   line-height: 1.5;
   color: #adb5bd;
   content: 'Browse';
-  background-color: #222;
+  background-color: #222222;
   border-left: inherit;
   border-radius: 0 0.25rem 0.25rem 0;
 }
@@ -677,7 +677,7 @@ textarea.form-control {
   flex-direction: column;
   min-width: 0;
   word-wrap: break-word;
-  background-color: #222;
+  background-color: #222222;
   background-clip: border-box;
   border: 1px solid rgba(0, 0, 0, 0.125);
   border-radius: 0.25rem;
@@ -794,7 +794,7 @@ textarea.form-control {
 }
 
 .bg-dark {
-  background-color: #222 !important;
+  background-color: #222222 !important;
 }
 
 .rounded {
