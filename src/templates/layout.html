@@ -44,11 +44,11 @@ content="This project is a movie database application made with Python Flask, Po
           {{session.user_name}}</a>
       </li>
       <li class="nav-item">
-        <a class="nav-link " href="/logout">Log out</a>
+        <a class="nav-link " href="/logout">Log Out</a>
       </li>
       {% else %}
       <li class="nav-item">
-        <a class="nav-link {{ ' active' if active_page == 'login' else ''}}" href="/login">Log in</a>
+        <a class="nav-link {{ ' active' if active_page == 'login' else ''}}" href="/login">Log In</a>
       </li>
       <li class="nav-item">
         <a class="nav-link {{ ' active' if active_page == 'register' else ''}}" href="/register">Register</a>
